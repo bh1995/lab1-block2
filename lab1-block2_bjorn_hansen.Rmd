@@ -1,0 +1,482 @@
+---
+title: "lab1block2_bjorn_hansen"
+author: "Bjorn_Hansen"
+date: "12/3/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. ENSEMBLE METHODS
+
+To start, the data is loaded into test and train sets with 2/3 of the data being used for training and 1/3 used for testing.  
+```{r, echo=FALSE}
+library(readxl)
+setwd("C:/Users/Bjorn/Documents/LIU/machine_learning")
+sp = read.csv2("spambase_lab1_block2.csv")
+sp$Spam = as.factor(sp$Spam)
+
+n=dim(sp)[1]
+set.seed(12345)
+id=sample(1:n, floor(n*(2/3)))
+train=sp[id,]
+test=sp[-id,]
+```
+
+## Adaboost
+
+Adaboost classification trees are used to train the model.Inside the boost control argument a value of 0.6 for "nu" was used as this value gave the lowest error. Adaboost predicts a loss score so to make a hard decision a threshold of 0.1 was used as this value gave roughly the lowest error. As can be seen from the confusion matrix below (using 100 trees) the diagonal values are quite high meaning that the ada model is predicting with high accuaracy. 
+
+```{r, echo=FALSE}
+library(mboost)
+  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = 100, nu = 0.6),
+                       family = AdaExp())
+  fitted.results_test= predict(ada_model,newdata=test)
+  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
+  print(table("Y"=test$Spam,"Y hat"=fitted.results_test))
+  
+  print(paste('Error for ada model:',1-sum(diag(ada_confmat_test)) / sum(ada_confmat_test)))
+```
+
+ Below is a plot of the recorded error for 10 up to 100 trees. 
+ 
+```{r, echo=FALSE}
+library(mboost)
+library(ggplot2)
+acc=0
+n = seq(10, 100, by = 10)
+for(i in n){
+  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = i, nu = 0.6),
+                       family = AdaExp())
+  fitted.results_test= predict(ada_model,newdata=test)
+  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  misClasificError_test = mean(fitted.results_test != test$Spam)
+  ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
+  acc[i] = sum(diag(ada_confmat_test)) / sum(ada_confmat_test)
+} 
+
+
+y_error <- na.omit(1-acc)
+y_error = y_error[-1]
+x_trees <- n
+ada_m <- na.omit(data.frame(x_trees, y_error))
+
+ggplot()+
+  ggtitle(" Error for Adaboost ")+
+  geom_point(data=ada_m, aes(x=x_trees, y=y_error), size=2)+
+  geom_line(data=ada_m, aes(x=x_trees, y=y_error), size=1)
+
+```
+
+
+## Random Forest
+
+A similar procedure was used to classify the spam data, this time using random forests. Again 10 up to 100 trees were used to train the model. The random forest model performed very well and had slightly better results than the adaboost model. 
+```{r, echo=FALSE}
+library(randomForest)
+
+rf_model_train = randomForest(Spam ~ ., data = train, ntree = 100)
+fitted.results_test_rf = predict(rf_model_train, test)
+
+rf_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test_rf)
+print(rf_confmat_test)
+
+print(paste('Error random forest model:',1-sum(diag(rf_confmat_test)) / sum(rf_confmat_test)))
+```
+
+In the plot below how the random forest error decreases linearly until about 30 trees but then stays at around 0.05 as the number of trees grows.  
+
+```{r, echo=FALSE}
+
+rf_model_test = randomForest(Spam ~ ., data = test, ntree = 100)
+plot(rf_model_test)
+```
+
+
+## 2. MIXTURE MODELS
+
+Below are plots for the em algorithm. We start by creating some random data. The obejctive of the em algorithm is to estimate given data points with the help of a bayesian approach. The em function takes data to try and estimate mu and pi. 
+
+In the so called E- step we are computing the posterior values for each observation via Bayes Theorem. We assume a certain ammount of clusters K, for example if K = 2 we are assuming the points are divided into two clusters. 
+
+In the so called M- step our previously estimated mu and pi are updated based on the new values. The loglikelihood of these values are calculated. This process continues itereating (100 times in our case) until are certain threshold of change between iterations is met. 
+
+The EM algorithm is a great solution when for example values for data points are missing from data sets. A risk that this algorithm has is that the true mu for the data distribution can be unknown and the algorithm can iterate and converge on a local maximi point instead of the global maximi point which is the true mu. This can lead to estimates that are not completely correct.
+
+Below are the results for when K is equal to two, three, and four. For all K values there is very like change between iterations after iteration eight. It is seen from the iterations that when K = 2 the convergence happens the quickest with only 12 iterations needed for the threshold to be met. K = 3 had the most interations with 46 total. This is probably due to the for two mus overlappping the third which made it not clear to distinguish it from the others. 
+
+
+```{r, echo=FALSE}
+set.seed(1234567890)
+max_it <- 100 # max number of EM iterations
+min_change <- 0.1 # min change in log likelihood between two consecutive EM iterations
+N=1000 # number of training points
+D=10 # number of dimensions
+x <- matrix(nrow=N, ncol=D) # training data
+true_pi <- vector(length = 3) # true mixing coefficients
+true_mu <- matrix(nrow=3, ncol=D) # true conditional distributions
+
+true_pi=c(1/3, 1/3, 1/3)
+true_mu[1,]=c(0.5,0.6,0.4,0.7,0.3,0.8,0.2,0.9,0.1,1)
+true_mu[2,]=c(0.5,0.4,0.6,0.3,0.7,0.2,0.8,0.1,0.9,0)
+true_mu[3,]=c(0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5)
+plot(true_mu[1,],
+     type="o",
+     col="blue",
+     ylim=c(0,1),
+     main = "Original Data",
+     xlab = "Number of Dimensions",
+     ylab = "True Mu")
+points(true_mu[2,], type="o", col="red")
+points(true_mu[3,], type="o", col="green")
+# Producing the training data
+for(n in 1:N) {
+  k <- sample(1:3,1,prob=true_pi)
+  for(d in 1:D) {
+    x[n,d] <- rbinom(1,1,true_mu[k,d])
+  }
+}
+em_algorithm <- function(c){
+  K=c # number of guessed components
+  z <- matrix(nrow=N, ncol=K) # fractional component assignments
+  pi <- vector(length = K) # mixing coefficients
+  mu <- matrix(nrow=K, ncol=D) # conditional distributions
+  llik <- vector(length = max_it) # log likelihood of the EM iterations
+  # Random initialization of the paramters
+  pi <- runif(K,0.49,0.51)
+  pi <- pi / sum(pi)
+  for(k in 1:K) {
+    mu[k,] <- runif(D,0.49,0.51)
+  }
+  pi
+  mu
+  for(it in 1:max_it) {
+    #plot(mu[1,], type="o", col="blue", ylim=c(0,1))
+    #points(mu[2,], type="o", col="red")
+    #points(mu[3,], type="o", col="green")
+    #points(mu[4,], type="o", col="yellow")
+    #Sys.sleep(0.5)
+    # E-step: Computation of the fractional component assignments (responsiblities)
+    # Your code here
+    for (n in 1:N){
+      phi = c()
+      for (j in 1:K){
+        y1 = mu[j,]^x[n,]
+        y2 = (1- mu[j,])^(1-x[n,])
+        phi = c(phi, prod(y1,y2))
+      }
+      
+      z[n,] = (pi*phi) / sum(pi*phi)
+    }
+    #Log likelihood computation.
+    # Your code here
+    likelihood = matrix(0,1000,K)
+    llik[it] = 0
+    for(n in 1:N){
+      for (k in 1:K){
+        likelihood[n,k] = pi[k]*prod( ((mu[k,]^x[n,])*((1-mu[k,])^(1-x[n,]))))
+      }
+      llik[it] = sum(log(rowSums(likelihood)))
+    }
+    cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
+    flush.console()
+    # Stop if the lok likelihood has not changed significantly
+    # Your code here
+    if (it > 1){
+      if (llik[it]-llik[it-1] < min_change){
+        if(K == 2){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 2",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+        }
+        else if(K == 3){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 3",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+          points(mu[3,], type="o", col="green")
+        }
+        else if(K == 4){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 4",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+          points(mu[3,], type="o", col="green")
+          points(mu[4,], type="o", col="yellow")
+        }
+        break()
+      }
+    }
+    #M-step: ML parameter estimation from the data and fractional component assignments
+    # Your code here
+    mu = (t(z) %*% x) /colSums(z)
+    # N - Total no. of observations
+    pi = colSums(z)/N
+  }
+  pi
+  mu
+}
+
+em_algorithm(2)
+em_algorithm(3)
+em_algorithm(4)
+
+```
+
+## Appendix
+```{r, eval=FALSE, echo=TRUE}
+
+library(mboost)
+library(readxl)
+library(randomForest)
+library(ggplot2)
+
+setwd("C:/Users/Bjorn/Documents/LIU/machine_learning")
+#data=read_excel("spambase.xlsx")
+
+sp = read.csv2("spambase_lab1_block2.csv")
+sp$Spam = as.factor(sp$Spam)
+
+n=dim(sp)[1]
+set.seed(12345)
+id=sample(1:n, floor(n*(2/3)))
+train=sp[id,]
+test=sp[-id,]
+
+## Adaboost ##
+
+ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = 100, nu=0.6),
+                          family = AdaExp())
+
+acc=0
+n = seq(10, 100, by = 10)
+for(i in n){
+  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = i, nu = 0.6),
+                       family = AdaExp())
+  fitted.results_test= predict(ada_model,newdata=test)
+  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  misClasificError_test = mean(fitted.results_test != test$Spam)
+  ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
+  acc[i] = sum(diag(ada_confmat_test)) / sum(ada_confmat_test)
+} 
+acc
+
+y_error <- na.omit(1-acc)
+y_error = y_error[-1]
+x_trees <- n
+ada_m <- na.omit(data.frame(x_trees, y_error))
+
+ggplot()+
+  ggtitle(" Error for Adaboost ")+
+  geom_point(data=ada_m, aes(x=x_trees, y=y_error), size=2)+
+  geom_line(data=ada_m, aes(x=x_trees, y=y_error), size=1)
+
+
+#train data
+fitted.results_train = predict(ada_model,newdata=train)
+fitted.results_train = ifelse(fitted.results_train > 0.1,1,0)
+misClasificError_train = mean(fitted.results_train != train$Spam)
+ada_confmat_train = table("Y"=train$Spam,"Y hat"=fitted.results_train)
+ada_confmat_train
+print(paste('Accuracy:',sum(diag(ada_confmat_train)) / sum(ada_confmat_train)))
+
+#test data
+fitted.results_test= predict(ada_model,newdata=test)
+fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+misClasificError_test = mean(fitted.results_test != test$Spam)
+ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
+print(paste('Accuracy:',sum(diag(ada_confmat_test)) / sum(ada_confmat_test)))
+#print(paste('Accuracy:',1-misClasificError_test))
+
+## Random Forest ##
+
+#train
+rf_model_train = randomForest(Spam ~ ., data = train, ntree = 100)
+
+rf_model_test = randomForest(Spam ~ ., data = test, ntree = 100)
+
+plot(rf_model_train)
+plot(rf_model_test)
+## The plot above seems to show that the error decreases linealy until about
+## 30 trees then stays relatively stable at around 0.05 as #trees grows.  
+
+#test data
+fitted.results_test_rf = predict(rf_model, test)
+
+rf_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test_rf)
+print(paste('Error:',1-sum(diag(rf_confmat_test)) / sum(rf_confmat_test)))
+error = 0
+ntree= seq(10,100,10)
+for(i in ntree){
+  
+  rf_model = randomForest(Spam ~ ., data = train, ntree = i)
+  fitted.results_test_rf = predict(rf_model, test)
+  
+  rf_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test_rf)
+ error[i] = (sum(diag(rf_confmat_test)) / sum(rf_confmat_test))
+
+}
+error_rf = na.omit(error)
+
+
+y_error = error_rf
+x_trees <- ntree
+rf_m <- na.omit(data.frame(x_trees, y_error))
+
+ggplot()+
+  ggtitle(" Error for Random Forest ")+
+  geom_point(data=rf_m, aes(x=x_trees, y=y_error), size=2)+
+  geom_line(data=rf_m, aes(x=x_trees, y=y_error), size=1)
+
+
+## EM Algorithm ##
+
+set.seed(1234567890)
+max_it <- 100 # max number of EM iterations
+min_change <- 0.1 # min change in log likelihood between two consecutive EM iterations
+N=1000 # number of training points
+D=10 # number of dimensions
+x <- matrix(nrow=N, ncol=D) # training data
+true_pi <- vector(length = 3) # true mixing coefficients
+true_mu <- matrix(nrow=3, ncol=D) # true conditional distributions
+
+true_pi=c(1/3, 1/3, 1/3)
+true_mu[1,]=c(0.5,0.6,0.4,0.7,0.3,0.8,0.2,0.9,0.1,1)
+true_mu[2,]=c(0.5,0.4,0.6,0.3,0.7,0.2,0.8,0.1,0.9,0)
+true_mu[3,]=c(0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5)
+plot(true_mu[1,],
+     type="o",
+     col="blue",
+     ylim=c(0,1),
+     main = "Original Data",
+     xlab = "Number of Dimensions",
+     ylab = "True Mu")
+points(true_mu[2,], type="o", col="red")
+points(true_mu[3,], type="o", col="green")
+# Producing the training data
+for(n in 1:N) {
+  k <- sample(1:3,1,prob=true_pi)
+  for(d in 1:D) {
+    x[n,d] <- rbinom(1,1,true_mu[k,d])
+  }
+}
+em_algorithm <- function(c){
+  K=c # number of guessed components
+  z <- matrix(nrow=N, ncol=K) # fractional component assignments
+  pi <- vector(length = K) # mixing coefficients
+  mu <- matrix(nrow=K, ncol=D) # conditional distributions
+  llik <- vector(length = max_it) # log likelihood of the EM iterations
+  # Random initialization of the paramters
+  pi <- runif(K,0.49,0.51)
+  pi <- pi / sum(pi)
+  for(k in 1:K) {
+    mu[k,] <- runif(D,0.49,0.51)
+  }
+  pi
+  mu
+  for(it in 1:max_it) {
+    #plot(mu[1,], type="o", col="blue", ylim=c(0,1))
+    #points(mu[2,], type="o", col="red")
+    #points(mu[3,], type="o", col="green")
+    #points(mu[4,], type="o", col="yellow")
+    #Sys.sleep(0.5)
+    # E-step: Computation of the fractional component assignments (responsiblities)
+    # Your code here
+    for (n in 1:N){
+      phi = c()
+      for (j in 1:K){
+        y1 = mu[j,]^x[n,]
+        y2 = (1- mu[j,])^(1-x[n,])
+        phi = c(phi, prod(y1,y2))
+      }
+      
+      z[n,] = (pi*phi) / sum(pi*phi)
+    }
+    #Log likelihood computation.
+    # Your code here
+    likelihood = matrix(0,1000,K)
+    llik[it] = 0
+    for(n in 1:N){
+      for (k in 1:K){
+        likelihood[n,k] = pi[k]*prod( ((mu[k,]^x[n,])*((1-mu[k,])^(1-x[n,]))))
+      }
+      llik[it] = sum(log(rowSums(likelihood)))
+    }
+    cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
+    flush.console()
+    # Stop if the lok likelihood has not changed significantly
+    # Your code here
+    if (it > 1){
+      if (llik[it]-llik[it-1] < min_change){
+        if(K == 2){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 2",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+        }
+        else if(K == 3){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 3",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+          points(mu[3,], type="o", col="green")
+        }
+        else if(K == 4){
+          plot(mu[1,],
+               type="o",
+               col="blue",
+               ylim=c(0,1),
+               main = "K = 4",
+               xlab = "Number of Dimensions",
+               ylab = "Estimated Mu")
+          points(mu[2,], type="o", col="red")
+          points(mu[3,], type="o", col="green")
+          points(mu[4,], type="o", col="yellow")
+        }
+        break()
+      }
+    }
+    #M-step: ML parameter estimation from the data and fractional component assignments
+    # Your code here
+    mu = (t(z) %*% x) /colSums(z)
+    # N - Total no. of observations
+    pi = colSums(z)/N
+  }
+  pi
+  mu
+  # plot(llik[1:it],
+  #      type="o",
+  #      main = "Log Likelihood",
+  #      xlab = "Number of Iterations",
+  #      ylab = "Log Likelihood")
+}
+
+em_algorithm(2)
+em_algorithm(3)
+em_algorithm(4)
+```
+
