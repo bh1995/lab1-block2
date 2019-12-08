@@ -1,0 +1,625 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={lab1 block 2 group 5 report},
+            pdfauthor={Ahmed Alhasan, Erik Anders, Bjorn\_Hansen},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+% grffile has become a legacy package: https://ctan.org/pkg/grffile
+\IfFileExists{grffile.sty}{%
+\usepackage{grffile}
+}{}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{lab1 block 2 group 5 report}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Ahmed Alhasan, Erik Anders, Bjorn\_Hansen}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{12/3/2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{ensemble-methods}{%
+\subsection{1. ENSEMBLE METHODS}\label{ensemble-methods}}
+
+To start, the data is loaded into test and train sets with 2/3 of the
+data being used for training and 1/3 used for testing.
+
+\begin{verbatim}
+## Warning in RNGkind("Mersenne-Twister", "Inversion", "Rounding"): non-uniform
+## 'Rounding' sampler used
+\end{verbatim}
+
+\hypertarget{adaboost}{%
+\subsection{Adaboost}\label{adaboost}}
+
+Adaboost classification trees are used to train the model.Inside the
+boost control argument a value of 0.6 for ``nu'' was used as this value
+gave the lowest error. Adaboost predicts a loss score so to make a hard
+decision a threshold of 0.1 was used as this value gave roughly the
+lowest error. As can be seen from the confusion matrix below (using 100
+trees) the diagonal values are quite high meaning that the ada model is
+predicting with high accuaracy.
+
+\begin{verbatim}
+## Loading required package: parallel
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: stabs
+\end{verbatim}
+
+\begin{verbatim}
+## This is mboost 2.9-1. See 'package?mboost' and 'news(package  = "mboost")'
+## for a complete list of changes.
+\end{verbatim}
+
+\begin{verbatim}
+##    Y hat
+## Y     0   1
+##   0 893  29
+##   1  51 561
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "Error for ada model: 0.0521512385919165"
+\end{verbatim}
+
+Below is a plot of the recorded error for 10 up to 100 trees.
+
+\begin{verbatim}
+## 
+## Attaching package: 'ggplot2'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:mboost':
+## 
+##     %+%
+\end{verbatim}
+
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\hypertarget{random-forest}{%
+\subsection{Random Forest}\label{random-forest}}
+
+The random forest algorithm is used to classify the mails as spam and
+non-spam. As can be seen from the confusion matrix below (using 500
+trees) the diagonal values are very high meaning that the randomForest
+model is predicting with high accuaracy.
+
+\begin{verbatim}
+## randomForest 4.6-14
+\end{verbatim}
+
+\begin{verbatim}
+## Type rfNews() to see new features/changes/bug fixes.
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'randomForest'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:ggplot2':
+## 
+##     margin
+\end{verbatim}
+
+\begin{verbatim}
+##    Y hat
+## Y     0   1
+##   0 888  34
+##   1  39 573
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0.04758801
+\end{verbatim}
+
+Below is a plot of the recorded error for 10 up to 100 trees.
+
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\hypertarget{mixture-models}{%
+\subsection{2. Mixture Models}\label{mixture-models}}
+
+\hypertarget{analysis}{%
+\subsection{Analysis:}\label{analysis}}
+
+\begin{itemize}
+\tightlist
+\item
+  After we created our data points using parameters mu and pi, the EM
+  function takes only the data points and guess mu and pi(pi here is
+  like a prior probablity based on our best guess that the
+  responsiblities are equal but it can be set differently)
+\item
+  In E-step we compute the posterior responsiblities for each
+  observation based on Bayes Theorem, if K=2 we make the assumbtion that
+  the points are in two clusters, anf if it is 3 the we assume 3
+  clustersand so on. γ(znk) = πk ∗ p(xn\textbar{}µk) PK j=1 πj ∗
+  p(xn\textbar{}µj ) , where i = 1, 2, \ldots{}, N
+\item
+  In the M-step we updated our mu and pi based on the new
+  responsiblities. µnew k = 1/Nk X N n=1 γ(znk)xn π new k = Nk N
+\item
+  Log likelikelihood then is calculated (doesn't matter if it is done
+  before M-step or after) to check if the updated values of mu and pi
+  are converging to the true values.
+\item
+  In the case of K=2 little convergence gained after the 8th iteration
+  and stopped at 12th iteration when we started to get minimum change.
+  the resulted values where close to the true µ1 and µ2, this because µ3
+  value was 0.5 in the middle of the other clusters, so this third
+  cluster splitted between the first two clusters without complications.
+\item
+  When K=3 the convergence also start to blateau when we reached the 8th
+  iteration and stopped at 46th iteration, this is because the values of
+  first two true mus overlapping the the third mu, making it complicated
+  for the algorithm to distinguish the third cluster from the other two
+  (which are more distinct from each other).
+\item
+  The same thing happened when K=4 also the convergence also start to
+  blateau when we reached the 8th iteration and stopped at 32nd
+  iteration this time, this is because the third cluster around true Mu3
+  got split into two cluster, one that is close to the first Mu and the
+  other close to the second Mu.
+\item
+  We can conclude from fact that the algorithm start to gain little
+  convergence at the 8th iteration is because the first two original
+  clusters are more distinguishable from the third cluster because their
+  Mus overlapp the third mu, and once the estimated Mus for these two
+  clusters are gained, the algorithm find it difficult to recognize the
+  third cluster.
+  \includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-1.pdf}
+\end{itemize}
+
+\begin{verbatim}
+## iteration:  1 log likelihood:  -6930.975 
+## iteration:  2 log likelihood:  -6929.125 
+## iteration:  3 log likelihood:  -6928.562 
+## iteration:  4 log likelihood:  -6924.281 
+## iteration:  5 log likelihood:  -6893.055 
+## iteration:  6 log likelihood:  -6728.948 
+## iteration:  7 log likelihood:  -6443.28 
+## iteration:  8 log likelihood:  -6368.318 
+## iteration:  9 log likelihood:  -6363.734 
+## iteration:  10 log likelihood:  -6363.109 
+## iteration:  11 log likelihood:  -6362.947 
+## iteration:  12 log likelihood:  -6362.897
+\end{verbatim}
+
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-2.pdf}
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-3.pdf}
+
+\begin{verbatim}
+## iteration:  1 log likelihood:  -6931.064 
+## iteration:  2 log likelihood:  -6928.051 
+## iteration:  3 log likelihood:  -6920.026 
+## iteration:  4 log likelihood:  -6864.176 
+## iteration:  5 log likelihood:  -6634.916 
+## iteration:  6 log likelihood:  -6409.234 
+## iteration:  7 log likelihood:  -6373.593 
+## iteration:  8 log likelihood:  -6367.833 
+## iteration:  9 log likelihood:  -6364.983 
+## iteration:  10 log likelihood:  -6363.074 
+## iteration:  11 log likelihood:  -6361.594 
+## iteration:  12 log likelihood:  -6360.309 
+## iteration:  13 log likelihood:  -6359.103 
+## iteration:  14 log likelihood:  -6357.93 
+## iteration:  15 log likelihood:  -6356.786 
+## iteration:  16 log likelihood:  -6355.689 
+## iteration:  17 log likelihood:  -6354.668 
+## iteration:  18 log likelihood:  -6353.742 
+## iteration:  19 log likelihood:  -6352.92 
+## iteration:  20 log likelihood:  -6352.199 
+## iteration:  21 log likelihood:  -6351.567 
+## iteration:  22 log likelihood:  -6351.011 
+## iteration:  23 log likelihood:  -6350.515 
+## iteration:  24 log likelihood:  -6350.069 
+## iteration:  25 log likelihood:  -6349.661 
+## iteration:  26 log likelihood:  -6349.286 
+## iteration:  27 log likelihood:  -6348.938 
+## iteration:  28 log likelihood:  -6348.616 
+## iteration:  29 log likelihood:  -6348.315 
+## iteration:  30 log likelihood:  -6348.036 
+## iteration:  31 log likelihood:  -6347.776 
+## iteration:  32 log likelihood:  -6347.534 
+## iteration:  33 log likelihood:  -6347.308 
+## iteration:  34 log likelihood:  -6347.099 
+## iteration:  35 log likelihood:  -6346.904 
+## iteration:  36 log likelihood:  -6346.722 
+## iteration:  37 log likelihood:  -6346.553 
+## iteration:  38 log likelihood:  -6346.394 
+## iteration:  39 log likelihood:  -6346.246 
+## iteration:  40 log likelihood:  -6346.107 
+## iteration:  41 log likelihood:  -6345.977 
+## iteration:  42 log likelihood:  -6345.854 
+## iteration:  43 log likelihood:  -6345.739 
+## iteration:  44 log likelihood:  -6345.63 
+## iteration:  45 log likelihood:  -6345.528 
+## iteration:  46 log likelihood:  -6345.431
+\end{verbatim}
+
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-4.pdf}
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-5.pdf}
+
+\begin{verbatim}
+## iteration:  1 log likelihood:  -6930.838 
+## iteration:  2 log likelihood:  -6928.641 
+## iteration:  3 log likelihood:  -6924.748 
+## iteration:  4 log likelihood:  -6896.25 
+## iteration:  5 log likelihood:  -6741.896 
+## iteration:  6 log likelihood:  -6452.658 
+## iteration:  7 log likelihood:  -6366.493 
+## iteration:  8 log likelihood:  -6359.764 
+## iteration:  9 log likelihood:  -6357.876 
+## iteration:  10 log likelihood:  -6356.372 
+## iteration:  11 log likelihood:  -6354.86 
+## iteration:  12 log likelihood:  -6353.31 
+## iteration:  13 log likelihood:  -6351.776 
+## iteration:  14 log likelihood:  -6350.33 
+## iteration:  15 log likelihood:  -6349.03 
+## iteration:  16 log likelihood:  -6347.908 
+## iteration:  17 log likelihood:  -6346.968 
+## iteration:  18 log likelihood:  -6346.196 
+## iteration:  19 log likelihood:  -6345.566 
+## iteration:  20 log likelihood:  -6345.055 
+## iteration:  21 log likelihood:  -6344.637 
+## iteration:  22 log likelihood:  -6344.293 
+## iteration:  23 log likelihood:  -6344.008 
+## iteration:  24 log likelihood:  -6343.768 
+## iteration:  25 log likelihood:  -6343.563 
+## iteration:  26 log likelihood:  -6343.387 
+## iteration:  27 log likelihood:  -6343.233 
+## iteration:  28 log likelihood:  -6343.097 
+## iteration:  29 log likelihood:  -6342.975 
+## iteration:  30 log likelihood:  -6342.864 
+## iteration:  31 log likelihood:  -6342.762 
+## iteration:  32 log likelihood:  -6342.668
+\end{verbatim}
+
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-6.pdf}
+\includegraphics{lab1-block2_group5_report_files/figure-latex/unnamed-chunk-6-7.pdf}
+
+\#\#Apendix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(mboost)}
+\KeywordTok{library}\NormalTok{(readxl)}
+\KeywordTok{library}\NormalTok{(randomForest)}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+
+\CommentTok{#setwd("C:/Users/Bjorn/Documents/LIU/machine_learning")}
+\CommentTok{#data=read_excel("spambase.xlsx")}
+
+\NormalTok{sp =}\StringTok{ }\KeywordTok{read.csv2}\NormalTok{(}\StringTok{"spambase_lab1_block2.csv"}\NormalTok{)}
+\NormalTok{sp}\OperatorTok{$}\NormalTok{Spam =}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(sp}\OperatorTok{$}\NormalTok{Spam)}
+
+\NormalTok{n=}\KeywordTok{dim}\NormalTok{(sp)[}\DecValTok{1}\NormalTok{]}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
+\NormalTok{id=}\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{n, }\KeywordTok{floor}\NormalTok{(n}\OperatorTok{*}\NormalTok{(}\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{)))}
+\NormalTok{train=sp[id,]}
+\NormalTok{test=sp[}\OperatorTok{-}\NormalTok{id,]}
+
+\CommentTok{## Adaboost ##}
+
+\NormalTok{ada_model =}\StringTok{ }\KeywordTok{blackboost}\NormalTok{(Spam }\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ train, }\DataTypeTok{control =} \KeywordTok{boost_control}\NormalTok{(}\DataTypeTok{mstop =} \DecValTok{100}\NormalTok{, }\DataTypeTok{nu=}\FloatTok{0.6}\NormalTok{),}
+                          \DataTypeTok{family =} \KeywordTok{AdaExp}\NormalTok{())}
+
+\NormalTok{acc=}\DecValTok{0}
+\NormalTok{n =}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{100}\NormalTok{, }\DataTypeTok{by =} \DecValTok{10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in}\NormalTok{ n)\{}
+\NormalTok{  ada_model =}\StringTok{ }\KeywordTok{blackboost}\NormalTok{(Spam }\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ train, }\DataTypeTok{control =} \KeywordTok{boost_control}\NormalTok{(}\DataTypeTok{mstop =}\NormalTok{ i, }\DataTypeTok{nu =} \FloatTok{0.6}\NormalTok{),}
+                       \DataTypeTok{family =} \KeywordTok{AdaExp}\NormalTok{())}
+\NormalTok{  fitted.results_test=}\StringTok{ }\KeywordTok{predict}\NormalTok{(ada_model,}\DataTypeTok{newdata=}\NormalTok{test)}
+\NormalTok{  fitted.results_test =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(fitted.results_test }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{  misClasificError_test =}\StringTok{ }\KeywordTok{mean}\NormalTok{(fitted.results_test }\OperatorTok{!=}\StringTok{ }\NormalTok{test}\OperatorTok{$}\NormalTok{Spam)}
+\NormalTok{  ada_confmat_test =}\StringTok{ }\KeywordTok{table}\NormalTok{(}\StringTok{"Y"}\NormalTok{=test}\OperatorTok{$}\NormalTok{Spam,}\StringTok{"Y hat"}\NormalTok{=fitted.results_test)}
+\NormalTok{  acc[i] =}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(ada_confmat_test)) }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(ada_confmat_test)}
+\NormalTok{\} }
+\NormalTok{acc}
+
+\NormalTok{y_error <-}\StringTok{ }\KeywordTok{na.omit}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{acc)}
+\NormalTok{y_error =}\StringTok{ }\NormalTok{y_error[}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+\NormalTok{x_trees <-}\StringTok{ }\NormalTok{n}
+\NormalTok{ada_m <-}\StringTok{ }\KeywordTok{na.omit}\NormalTok{(}\KeywordTok{data.frame}\NormalTok{(x_trees, y_error))}
+
+\KeywordTok{ggplot}\NormalTok{()}\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{" Error for Adaboost "}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ada_m, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x_trees, }\DataTypeTok{y=}\NormalTok{y_error), }\DataTypeTok{size=}\DecValTok{2}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ada_m, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x_trees, }\DataTypeTok{y=}\NormalTok{y_error), }\DataTypeTok{size=}\DecValTok{1}\NormalTok{)}
+
+
+\CommentTok{#train data}
+\NormalTok{fitted.results_train =}\StringTok{ }\KeywordTok{predict}\NormalTok{(ada_model,}\DataTypeTok{newdata=}\NormalTok{train)}
+\NormalTok{fitted.results_train =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(fitted.results_train }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{misClasificError_train =}\StringTok{ }\KeywordTok{mean}\NormalTok{(fitted.results_train }\OperatorTok{!=}\StringTok{ }\NormalTok{train}\OperatorTok{$}\NormalTok{Spam)}
+\NormalTok{ada_confmat_train =}\StringTok{ }\KeywordTok{table}\NormalTok{(}\StringTok{"Y"}\NormalTok{=train}\OperatorTok{$}\NormalTok{Spam,}\StringTok{"Y hat"}\NormalTok{=fitted.results_train)}
+\NormalTok{ada_confmat_train}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{'Accuracy:'}\NormalTok{,}\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(ada_confmat_train)) }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(ada_confmat_train)))}
+
+\CommentTok{#test data}
+\NormalTok{fitted.results_test=}\StringTok{ }\KeywordTok{predict}\NormalTok{(ada_model,}\DataTypeTok{newdata=}\NormalTok{test)}
+\NormalTok{fitted.results_test =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(fitted.results_test }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{misClasificError_test =}\StringTok{ }\KeywordTok{mean}\NormalTok{(fitted.results_test }\OperatorTok{!=}\StringTok{ }\NormalTok{test}\OperatorTok{$}\NormalTok{Spam)}
+\NormalTok{ada_confmat_test =}\StringTok{ }\KeywordTok{table}\NormalTok{(}\StringTok{"Y"}\NormalTok{=test}\OperatorTok{$}\NormalTok{Spam,}\StringTok{"Y hat"}\NormalTok{=fitted.results_test)}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{'Accuracy:'}\NormalTok{,}\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(ada_confmat_test)) }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(ada_confmat_test)))}
+\CommentTok{#print(paste('Accuracy:',1-misClasificError_test))}
+
+\CommentTok{## Random Forest ##}
+
+\NormalTok{rf<-}\KeywordTok{randomForest}\NormalTok{(Spam }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data=}\NormalTok{ train)}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(rf, }\DataTypeTok{newdata =}\NormalTok{ test, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+  \KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(}\StringTok{"Y"}\NormalTok{=test}\OperatorTok{$}\NormalTok{Spam,}\StringTok{"Y hat"}\NormalTok{=p))}
+\NormalTok{  misClasificError <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(p }\OperatorTok{!=}\StringTok{ }\NormalTok{test}\OperatorTok{$}\NormalTok{Spam)}
+\NormalTok{  misClasificError}
+  
+\NormalTok{misClasificError <-}\StringTok{ }\DecValTok{0}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{100}\NormalTok{, }\DecValTok{10}\NormalTok{)) \{}
+\NormalTok{  rf<-}\KeywordTok{randomForest}\NormalTok{(Spam }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data=}\NormalTok{ train, }\DataTypeTok{ntree=}\NormalTok{i)}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(rf, }\DataTypeTok{newdata =}\NormalTok{ test, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+\NormalTok{  misClasificError[(i }\OperatorTok{/}\StringTok{ }\DecValTok{10}\NormalTok{)] <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(p }\OperatorTok{!=}\StringTok{ }\NormalTok{test}\OperatorTok{$}\NormalTok{Spam)}
+\NormalTok{\}}
+\NormalTok{rf_df<-}\KeywordTok{data.frame}\NormalTok{(}\StringTok{"rferror"}\NormalTok{=misClasificError,}\StringTok{"rftrees"}\NormalTok{=}\KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{,}\DecValTok{100}\NormalTok{,}\DecValTok{10}\NormalTok{))}
+
+\KeywordTok{ggplot}\NormalTok{()}\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{" Error for RandomForrest "}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{rf_df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{rftrees, }\DataTypeTok{y=}\NormalTok{rferror), }\DataTypeTok{size=}\DecValTok{2}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{rf_df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{rftrees, }\DataTypeTok{y=}\NormalTok{rferror), }\DataTypeTok{size=}\DecValTok{1}\NormalTok{)}
+
+
+\CommentTok{## Mixed models / EM algorithm ##}
+
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1234567890}\NormalTok{)}
+\NormalTok{max_it <-}\StringTok{ }\DecValTok{100} \CommentTok{# max number of EM iterations}
+\NormalTok{min_change <-}\StringTok{ }\FloatTok{0.1} \CommentTok{# min change in log likelihood between two consecutive EM iterations}
+\NormalTok{N=}\DecValTok{1000} \CommentTok{# number of training points}
+\NormalTok{D=}\DecValTok{10} \CommentTok{# number of dimensions}
+\NormalTok{x <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{nrow=}\NormalTok{N, }\DataTypeTok{ncol=}\NormalTok{D) }\CommentTok{# training data}
+\NormalTok{true_pi <-}\StringTok{ }\KeywordTok{vector}\NormalTok{(}\DataTypeTok{length =} \DecValTok{3}\NormalTok{) }\CommentTok{# true mixing coefficients}
+\NormalTok{true_mu <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{nrow=}\DecValTok{3}\NormalTok{, }\DataTypeTok{ncol=}\NormalTok{D) }\CommentTok{# true conditional distributions}
+
+\NormalTok{true_pi=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{)}
+\NormalTok{true_mu[}\DecValTok{1}\NormalTok{,]=}\KeywordTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.6}\NormalTok{,}\FloatTok{0.4}\NormalTok{,}\FloatTok{0.7}\NormalTok{,}\FloatTok{0.3}\NormalTok{,}\FloatTok{0.8}\NormalTok{,}\FloatTok{0.2}\NormalTok{,}\FloatTok{0.9}\NormalTok{,}\FloatTok{0.1}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{true_mu[}\DecValTok{2}\NormalTok{,]=}\KeywordTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.4}\NormalTok{,}\FloatTok{0.6}\NormalTok{,}\FloatTok{0.3}\NormalTok{,}\FloatTok{0.7}\NormalTok{,}\FloatTok{0.2}\NormalTok{,}\FloatTok{0.8}\NormalTok{,}\FloatTok{0.1}\NormalTok{,}\FloatTok{0.9}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{true_mu[}\DecValTok{3}\NormalTok{,]=}\KeywordTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.5}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(true_mu[}\DecValTok{1}\NormalTok{,],}
+     \DataTypeTok{type=}\StringTok{"o"}\NormalTok{,}
+     \DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}
+     \DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+     \DataTypeTok{main =} \StringTok{"Original Data"}\NormalTok{,}
+     \DataTypeTok{xlab =} \StringTok{"Number of Dimensions"}\NormalTok{,}
+     \DataTypeTok{ylab =} \StringTok{"True Mu"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(true_mu[}\DecValTok{2}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(true_mu[}\DecValTok{3}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"green"}\NormalTok{)}
+\CommentTok{# Producing the training data}
+\ControlFlowTok{for}\NormalTok{(n }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{N) \{}
+\NormalTok{  k <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DataTypeTok{prob=}\NormalTok{true_pi)}
+  \ControlFlowTok{for}\NormalTok{(d }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{D) \{}
+\NormalTok{    x[n,d] <-}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,true_mu[k,d])}
+\NormalTok{  \}}
+\NormalTok{\}}
+\NormalTok{em_algorithm <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(c)\{}
+\NormalTok{  K=c }\CommentTok{# number of guessed components}
+\NormalTok{  z <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{nrow=}\NormalTok{N, }\DataTypeTok{ncol=}\NormalTok{K) }\CommentTok{# fractional component assignments}
+\NormalTok{  pi <-}\StringTok{ }\KeywordTok{vector}\NormalTok{(}\DataTypeTok{length =}\NormalTok{ K) }\CommentTok{# mixing coefficients}
+\NormalTok{  mu <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{nrow=}\NormalTok{K, }\DataTypeTok{ncol=}\NormalTok{D) }\CommentTok{# conditional distributions}
+\NormalTok{  llik <-}\StringTok{ }\KeywordTok{vector}\NormalTok{(}\DataTypeTok{length =}\NormalTok{ max_it) }\CommentTok{# log likelihood of the EM iterations}
+  \CommentTok{# Random initialization of the paramters}
+\NormalTok{  pi <-}\StringTok{ }\KeywordTok{runif}\NormalTok{(K,}\FloatTok{0.49}\NormalTok{,}\FloatTok{0.51}\NormalTok{)}
+\NormalTok{  pi <-}\StringTok{ }\NormalTok{pi }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(pi)}
+  \ControlFlowTok{for}\NormalTok{(k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{K) \{}
+\NormalTok{    mu[k,] <-}\StringTok{ }\KeywordTok{runif}\NormalTok{(D,}\FloatTok{0.49}\NormalTok{,}\FloatTok{0.51}\NormalTok{)}
+\NormalTok{  \}}
+\NormalTok{  pi}
+\NormalTok{  mu}
+  \ControlFlowTok{for}\NormalTok{(it }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{max_it) \{}
+    \CommentTok{#plot(mu[1,], type="o", col="blue", ylim=c(0,1))}
+    \CommentTok{#points(mu[2,], type="o", col="red")}
+    \CommentTok{#points(mu[3,], type="o", col="green")}
+    \CommentTok{#points(mu[4,], type="o", col="yellow")}
+    \CommentTok{#Sys.sleep(0.5)}
+    \CommentTok{# E-step: Computation of the fractional component assignments (responsiblities)}
+    \CommentTok{# Your code here}
+    \ControlFlowTok{for}\NormalTok{ (n }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{N)\{}
+\NormalTok{      phi =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+      \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{K)\{}
+\NormalTok{        y1 =}\StringTok{ }\NormalTok{mu[j,]}\OperatorTok{^}\NormalTok{x[n,]}
+\NormalTok{        y2 =}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{-}\StringTok{ }\NormalTok{mu[j,])}\OperatorTok{^}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{x[n,])}
+\NormalTok{        phi =}\StringTok{ }\KeywordTok{c}\NormalTok{(phi, }\KeywordTok{prod}\NormalTok{(y1,y2))}
+\NormalTok{      \}}
+      
+\NormalTok{      z[n,] =}\StringTok{ }\NormalTok{(pi}\OperatorTok{*}\NormalTok{phi) }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(pi}\OperatorTok{*}\NormalTok{phi)}
+\NormalTok{    \}}
+    \CommentTok{#Log likelihood computation.}
+    \CommentTok{# Your code here}
+\NormalTok{    likelihood =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{,K)}
+\NormalTok{    llik[it] =}\StringTok{ }\DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{(n }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{N)\{}
+      \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{K)\{}
+\NormalTok{        likelihood[n,k] =}\StringTok{ }\NormalTok{pi[k]}\OperatorTok{*}\KeywordTok{prod}\NormalTok{( ((mu[k,]}\OperatorTok{^}\NormalTok{x[n,])}\OperatorTok{*}\NormalTok{((}\DecValTok{1}\OperatorTok{-}\NormalTok{mu[k,])}\OperatorTok{^}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{x[n,]))))}
+\NormalTok{      \}}
+\NormalTok{      llik[it] =}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{log}\NormalTok{(}\KeywordTok{rowSums}\NormalTok{(likelihood)))}
+\NormalTok{    \}}
+    \KeywordTok{cat}\NormalTok{(}\StringTok{"iteration: "}\NormalTok{, it, }\StringTok{"log likelihood: "}\NormalTok{, llik[it], }\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+    \KeywordTok{flush.console}\NormalTok{()}
+    \CommentTok{# Stop if the lok likelihood has not changed significantly}
+    \CommentTok{# Your code here}
+    \ControlFlowTok{if}\NormalTok{ (it }\OperatorTok{>}\StringTok{ }\DecValTok{1}\NormalTok{)\{}
+      \ControlFlowTok{if}\NormalTok{ (llik[it]}\OperatorTok{-}\NormalTok{llik[it}\DecValTok{-1}\NormalTok{] }\OperatorTok{<}\StringTok{ }\NormalTok{min_change)\{}
+        \ControlFlowTok{if}\NormalTok{(K }\OperatorTok{==}\StringTok{ }\DecValTok{2}\NormalTok{)\{}
+          \KeywordTok{plot}\NormalTok{(mu[}\DecValTok{1}\NormalTok{,],}
+               \DataTypeTok{type=}\StringTok{"o"}\NormalTok{,}
+               \DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}
+               \DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+               \DataTypeTok{main =} \StringTok{"K = 2"}\NormalTok{,}
+               \DataTypeTok{xlab =} \StringTok{"Number of Dimensions"}\NormalTok{,}
+               \DataTypeTok{ylab =} \StringTok{"Estimated Mu"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{2}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\NormalTok{        \}}
+        \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(K }\OperatorTok{==}\StringTok{ }\DecValTok{3}\NormalTok{)\{}
+          \KeywordTok{plot}\NormalTok{(mu[}\DecValTok{1}\NormalTok{,],}
+               \DataTypeTok{type=}\StringTok{"o"}\NormalTok{,}
+               \DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}
+               \DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+               \DataTypeTok{main =} \StringTok{"K = 3"}\NormalTok{,}
+               \DataTypeTok{xlab =} \StringTok{"Number of Dimensions"}\NormalTok{,}
+               \DataTypeTok{ylab =} \StringTok{"Estimated Mu"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{2}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{3}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"green"}\NormalTok{)}
+\NormalTok{        \}}
+        \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(K }\OperatorTok{==}\StringTok{ }\DecValTok{4}\NormalTok{)\{}
+          \KeywordTok{plot}\NormalTok{(mu[}\DecValTok{1}\NormalTok{,],}
+               \DataTypeTok{type=}\StringTok{"o"}\NormalTok{,}
+               \DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}
+               \DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+               \DataTypeTok{main =} \StringTok{"K = 4"}\NormalTok{,}
+               \DataTypeTok{xlab =} \StringTok{"Number of Dimensions"}\NormalTok{,}
+               \DataTypeTok{ylab =} \StringTok{"Estimated Mu"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{2}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{3}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"green"}\NormalTok{)}
+          \KeywordTok{points}\NormalTok{(mu[}\DecValTok{4}\NormalTok{,], }\DataTypeTok{type=}\StringTok{"o"}\NormalTok{, }\DataTypeTok{col=}\StringTok{"yellow"}\NormalTok{)}
+\NormalTok{        \}}
+        \ControlFlowTok{break}\NormalTok{()}
+\NormalTok{      \}}
+\NormalTok{    \}}
+    \CommentTok{#M-step: ML parameter estimation from the data and fractional component assignments}
+    \CommentTok{# Your code here}
+\NormalTok{    mu =}\StringTok{ }\NormalTok{(}\KeywordTok{t}\NormalTok{(z) }\OperatorTok{%*%}\StringTok{ }\NormalTok{x) }\OperatorTok{/}\KeywordTok{colSums}\NormalTok{(z)}
+    \CommentTok{# N - Total no. of observations}
+\NormalTok{    pi =}\StringTok{ }\KeywordTok{colSums}\NormalTok{(z)}\OperatorTok{/}\NormalTok{N}
+\NormalTok{  \}}
+\NormalTok{  pi}
+\NormalTok{  mu}
+  \CommentTok{# plot(llik[1:it],}
+  \CommentTok{#      type="o",}
+  \CommentTok{#      main = "Log Likelihood",}
+  \CommentTok{#      xlab = "Number of Iterations",}
+  \CommentTok{#      ylab = "Log Likelihood")}
+\NormalTok{\}}
+
+\KeywordTok{em_algorithm}\NormalTok{(}\DecValTok{2}\NormalTok{)}
+\KeywordTok{em_algorithm}\NormalTok{(}\DecValTok{3}\NormalTok{)}
+\KeywordTok{em_algorithm}\NormalTok{(}\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
