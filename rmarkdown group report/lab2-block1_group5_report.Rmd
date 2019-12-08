@@ -190,7 +190,6 @@ loss_function(test,loss_mat)
 ```
 As can be seen from the results using training and test data above, When the loss matrix was applied the FPR decreased, but the error rate has gotten worse.
 
-## Assignment 3. Uncertainty estimation
 # Assignment 3. Uncertainty estimation
 
 ## 3.1 Appropriate Model
@@ -352,7 +351,7 @@ ggplot(data = as.data.frame(state),
 \newpage
 
 ## Apendix
-
+```{r, echo=TRUE, eval=FALSE}
 library(readxl)
 library(tree)
 library(e1071)
@@ -649,3 +648,4 @@ ggplot(data = as.data.frame(state),
 
 ### Assignment 4. Principal components ###
 
+```
