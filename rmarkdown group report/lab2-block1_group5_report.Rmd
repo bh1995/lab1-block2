@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ```{r, include=TRUE}
-setwd("C:/Users/Bjorn/Documents/LIU/machine_learning/labs")
+setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
 library(readxl)
 library(tree)
 library(e1071)
@@ -24,7 +24,7 @@ library(fastICA)
 
 ## Assignment 2. Analysis of credit scoring
 ```{r, echo=FALSE, comment=FALSE}
-setwd("C:/Users/Bjorn/Documents/LIU/machine_learning/labs")
+setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
 credit_data = read_excel("creditscoring.xls")
 credit_data$good_bad = as.factor(credit_data$good_bad)
 n=dim(credit_data)[1]
@@ -190,8 +190,159 @@ loss_function(test,loss_mat)
 ```
 As can be seen from the results using training and test data above, When the loss matrix was applied the FPR decreased, but the error rate has gotten worse.
 
-## Assignment 3. Uncertainty estimation
+# Assignment 3. Uncertainty estimation
 
+## 3.1 Appropriate Model
+```{r echo=FALSE, fig.align='center', fig.height=4, out.width="70%"}
+setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
+state <- read.csv2("State.csv", header = TRUE)
+state <- state[order(state$MET),]
+
+ggplot(data = as.data.frame(state), aes(y = state[,1], x = state[,3]))+
+  xlab("MET") + ylab("EX")+
+  geom_text_repel(label = state[,8], size = 2)+
+  geom_point(color = 'red') 
+```
+
+- Because it's hard to select any model without overfitting and we don't know the distribution of the data, a combination of ploynomial model or splines with bootstrap would be good option.
+
+
+## 3.2 Tree Model
+```{r echo=FALSE, fig.align='center', fig.height=4, out.width="70%"}
+tree_model <- tree(EX ~ MET, 
+                   data = state, 
+                   control = tree.control(nobs = nrow(state), 
+                                          minsize = 8))
+set.seed(12345)
+best_tree1 <- cv.tree(tree_model)
+best_tree2 <- prune.tree(tree_model, best = 3)
+summary(best_tree2)
+
+plot(best_tree2)
+text(best_tree2, pretty=1, 
+     cex = 0.8, 
+     xpd = TRUE)
+
+tree_pred <- predict(best_tree2, newdata = state)
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_point(x = state$MET, y = tree_pred, col = "blue")
+
+hist(residuals(best_tree2),
+     main = "Residuals Histogram",
+     xlab = "Residuals")
+```
+
+- An ideal representation of the residuals in the histogram should take a Normal distribution where most of the ressiduals are close to zero and few in the positive and the negative side, however in this case it is not and there are many predictions with high residuals on the sides, also on the positive side there are more outliers (have high residuals)
+
+- The tree model fit very poorly to the data, there are many outliers on both sides of the three terminal nodes.
+
+&nbsp;
+
+## 3.3 Nonparametric Bootstrap
+
+```{r echo=FALSE, fig.align='center', fig.height=4, out.width="70%", warning=FALSE}
+f <- function(data, ind){
+  set.seed(12345)
+  sample  <- state[ind,]
+  my_tree <- tree(EX ~ MET, 
+                data = sample,
+                control = tree.control(nobs = nrow(sample), minsize = 8)) 
+  
+  pruned_tree <- prune.tree(my_tree, best = 3) 
+
+  pred    <- predict(pruned_tree, newdata = state)
+  return(pred)
+}
+
+res  <- boot(state, f, R=1000)
+
+conf <- envelope(res, level=0.95) 
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_line(aes(x = state$MET, y = tree_pred), col = "blue") +
+  geom_line(aes(x = state$MET, y = conf$point[1,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = conf$point[2,]), col = "orange")
+```
+
+
+- The confidence interval is bumby because of the variance of point estimates as we are getting large and varied residuals every time take a bootstrap sample.
+
+- Because the confidence interval is rather large it confirms the belief that the tree model is a poor fit for this data set and not reliable.
+
+
+## 3.4 Parametric Bootstrab
+
+```{r echo=FALSE, fig.align='center', fig.height=4, out.width="70%", warning=FALSE}
+mle <- best_tree2
+
+rng <- function(data, mle){ 
+  data1    <- data.frame(EX = data$EX, MET = data$MET) 
+  n        <- length(data1$EX)
+  pred     <- predict(mle, newdata = state)
+  residual <- data1$EX - pred
+  data1$EX <- rnorm(n, pred, sd(residual))
+  return(data1)
+}
+
+f1 <- function(data){
+  res      <- tree(EX ~ MET,
+                  data = data, 
+                  control = tree.control(nobs=nrow(state),minsize = 8))
+  opt_res  <- prune.tree(res, best = 3)
+  return(predict(opt_res, newdata = data))
+}
+
+f2 <- function(data){
+  res      <- tree(EX ~ MET,
+                  data = data, 
+                  control = tree.control(nobs=nrow(state),minsize = 8))
+  opt_res  <- prune.tree(res, best = 3)
+  n        <- length(state$EX)
+  opt_pred <- predict(opt_res, newdata = state)
+  pred     <- rnorm(n,opt_pred, sd(residuals(mle)))
+  return(pred)
+}
+set.seed(12345)
+par_boot_conf <- boot(state, statistic = f1, R = 1000, mle = mle, ran.gen = rng, sim = "parametric") 
+conf_interval <- envelope(par_boot_conf, level=0.95)  
+
+set.seed(12345)
+par_boot_pred <- boot(state, statistic = f2, R = 1000, mle = mle, ran.gen = rng, sim = "parametric") 
+pred_interval <- envelope(par_boot_pred, level=0.95)  
+
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_line(aes(x = state$MET, y = tree_pred), col = "blue") +
+  geom_line(aes(x = state$MET, y = conf_interval$point[1,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = conf_interval$point[2,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = pred_interval$point[1,]), col = "black") +
+  geom_line(aes(x = state$MET, y = pred_interval$point[2,]), col = "black")
+```
+
+- The confidence interval is smoother and narrawer with parametric bootsrap which make the tree model a slightly more reliable, however the confidence interval still wide enough allowing wide range of the prediction means to fit in.
+
+- Only 2 points out of 48 are outside the prediction interval which is around 5%, and that's how it should be because we acounted for the error rate(the residuals) in the prediction interval, meaning 95% the future sampled EX values should be withen this interval.
+
+&nbsp; 
+
+## 3.5 Optimal Bootstrap 
+
+- The Parametric Bootstrap is more optimal because it gives less variance in the confidence interval than Nonparametric Bootstrap even with high residuals.
+
+\newpage 
 
 ## Assignment 4. Principal components
 
@@ -270,8 +421,10 @@ The ICA plot basically takes the standarized PCA factors after scaling and white
 data onto its principal component directions” and rotate them to maximmize the non-gaussianity of
 the two components, thats why we see the ICA plot as a rotated PCA plot.
 
-## Apendix
+\newpage
 
+## Apendix
+```{r, echo=TRUE, eval=FALSE}
 library(readxl)
 library(tree)
 library(e1071)
@@ -281,7 +434,7 @@ library(ggplot2)
 library(boot)
 library(fastICA)
 
-## Assignment 2. Analysis of credit scoring ##
+### Assignment 2. Analysis of credit scoring ###
 
 credit_data = read_excel("creditscoring.xls")
 credit_data$good_bad = as.factor(credit_data$good_bad)
@@ -454,7 +607,121 @@ print("Testing data:")
 loss_function(test,loss_mat)
 # When the loss matrix was applied the FPR decreased, but the error rate has gotten worse.
 
-## Assignment 4. Principal components
+### Assignment 3. Uncertainty estimation ###
+
+state <- read.csv2("Data/State.csv", header = TRUE)
+state <- state[order(state$MET),]
+
+ggplot(data = as.data.frame(state), aes(y = state[,1], x = state[,3]))+
+  xlab("MET") + ylab("EX")+
+  geom_text_repel(label = state[,8], size = 2)+
+  geom_point(color = 'red') 
+
+tree_model <- tree(EX ~ MET, 
+                   data = state, 
+                   control = tree.control(nobs = nrow(state), 
+                                          minsize = 8))
+set.seed(12345)
+best_tree1 <- cv.tree(tree_model)
+best_tree2 <- prune.tree(tree_model, best = 3)
+summary(best_tree2)
+
+plot(best_tree2)
+text(best_tree2, pretty=1, 
+     cex = 0.8, 
+     xpd = TRUE)
+
+tree_pred <- predict(best_tree2, newdata = state)
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_point(x = state$MET, y = tree_pred, col = "blue")
+
+hist(residuals(best_tree2),
+     main = "Residuals Histogram",
+     xlab = "Residuals")
+
+f <- function(data, ind){
+  set.seed(12345)
+  sample  <- state[ind,]
+  my_tree <- tree(EX ~ MET, 
+                data = sample,
+                control = tree.control(nobs = nrow(sample), minsize = 8)) 
+  
+  pruned_tree <- prune.tree(my_tree, best = 3) 
+
+  pred    <- predict(pruned_tree, newdata = state)
+  return(pred)
+}
+
+res  <- boot(state, f, R=1000)
+
+conf <- envelope(res, level=0.95) 
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_line(aes(x = state$MET, y = tree_pred), col = "blue") +
+  geom_line(aes(x = state$MET, y = conf$point[1,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = conf$point[2,]), col = "orange")
+
+mle <- best_tree2
+
+rng <- function(data, mle){ 
+  data1    <- data.frame(EX = data$EX, MET = data$MET) 
+  n        <- length(data1$EX)
+  pred     <- predict(mle, newdata = state)
+  residual <- data1$EX - pred
+  data1$EX <- rnorm(n, pred, sd(residual))
+  return(data1)
+}
+
+f1 <- function(data){
+  res      <- tree(EX ~ MET,
+                  data = data, 
+                  control = tree.control(nobs=nrow(state),minsize = 8))
+  opt_res  <- prune.tree(res, best = 3)
+  return(predict(opt_res, newdata = data))
+}
+
+f2 <- function(data){
+  res      <- tree(EX ~ MET,
+                  data = data, 
+                  control = tree.control(nobs=nrow(state),minsize = 8))
+  opt_res  <- prune.tree(res, best = 3)
+  n        <- length(state$EX)
+  opt_pred <- predict(opt_res, newdata = state)
+  pred     <- rnorm(n,opt_pred, sd(residuals(mle)))
+  return(pred)
+}
+set.seed(12345)
+par_boot_conf <- boot(state, statistic = f1, R = 1000, mle = mle, ran.gen = rng, sim = "parametric") 
+conf_interval <- envelope(par_boot_conf, level=0.95)  
+
+set.seed(12345)
+par_boot_pred <- boot(state, statistic = f2, R = 1000, mle = mle, ran.gen = rng, sim = "parametric") 
+pred_interval <- envelope(par_boot_pred, level=0.95)  
+
+
+ggplot(data = as.data.frame(state), 
+       aes(y = state[,1], x = state[,3])) +
+  xlab("MET") + 
+  ylab("EX") +
+  geom_point(col = "red") +
+  geom_line(aes(x = state$MET, y = tree_pred), col = "blue") +
+  geom_line(aes(x = state$MET, y = conf_interval$point[1,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = conf_interval$point[2,]), col = "orange") +
+  geom_line(aes(x = state$MET, y = pred_interval$point[1,]), col = "black") +
+  geom_line(aes(x = state$MET, y = pred_interval$point[2,]), col = "black")
+
+
+
+### Assignment 4. Principal components ###
 
 #import data
 setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
@@ -500,4 +767,4 @@ plot(W_[,1], main="PC1 Traceplot", xlab = "Features", ylab = "Scores")
 plot(W_[,2], main="PC2 Traceplot", xlab = "Features", ylab = "Scores")
 
 plot(ica$S[,1],ica$S[,2], xlab = "W1", ylab = "W2")
-
+```
