@@ -195,6 +195,81 @@ As can be seen from the results using training and test data above, When the los
 
 ## Assignment 4. Principal components
 
+
+```{r, echo=FALSE}
+#import data
+setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
+r_data<-read.csv2("NIRSpectra.csv")
+data<-r_data[,-which(names(r_data)=="Viscosity")]
+```
+
+
+```{r, echo=FALSE}
+#1.
+pca<-prcomp(data, center=TRUE, scale. = TRUE)
+
+df<-c()
+for (i in 1:length(pca$sdev)) {
+  df[i]<-pca$sdev[i]^2/sum(pca$sdev^2)
+}
+plot(df, type = "l")
+vsum<-0
+for (i in 1:length(pca$sdev)) {
+  vsum<-vsum+pca$sdev[i]^2/sum(pca$sdev^2)
+  if (vsum>0.99) {
+    print(vsum)
+    print(i)
+    break()
+  }
+}
+```
+As is shown in the plot and the console output. Using the first two PCs we can already explain 99.6% of the variation.
+
+
+```{r, echo=FALSE}
+plot(pca$x[,"PC1"],pca$x[,"PC2"], xlab = "PC1", ylab = "PC2")
+```
+
+Yes, there are two variables which have very extreme values for PC1. One of them is also extrem for PC2(~-7). There is also a group of 5 variables with values for PC1 from 40-60. All the other values for PC1 seem to be smaller than 30. PC2 seems almost normally distributed, with small outliers of 2 variables in both directions(5-6 and ~-8).
+
+
+
+```{r, echo=FALSE}
+#2.
+plot(pca$rotation[,1], main="PC1 Traceplot", xlab = "Features", ylab = "Scores")
+plot(pca$rotation[,2], main="PC2 Traceplot", xlab = "Features", ylab = "Scores")
+```
+
+Yes, PC2 only shows high scores for a bunch of original features (nr. 110+). This means that PC2 is only explained by few features.
+
+
+
+```{r, echo=FALSE}
+#3.
+set.seed(12345)
+mdata<-as.matrix(data)
+
+ica<-fastICA(mdata, 2, fun = "logcosh", verbose = TRUE)
+
+W_<-ica$K %*% ica$W
+
+plot(W_[,1], main="PC1 Traceplot", xlab = "Features", ylab = "Scores")
+plot(W_[,2], main="PC2 Traceplot", xlab = "Features", ylab = "Scores")
+```
+
+It appears as if the plots for PC1 and PC2 are switched for W' compared to 2.
+
+```{r, echo=FALSE}
+plot(ica$S[,1],ica$S[,2], xlab = "W1", ylab = "W2")
+```
+
+W is the un-mixing matrix that maximizes the non-gaussianity of the components so we can extract
+the independent components.
+
+The ICA plot basically takes the standarized PCA factors after scaling and whitening “projecting the
+data onto its principal component directions” and rotate them to maximmize the non-gaussianity of
+the two components, thats why we see the ICA plot as a rotated PCA plot.
+
 ## Apendix
 
 library(readxl)
@@ -379,4 +454,50 @@ print("Testing data:")
 loss_function(test,loss_mat)
 # When the loss matrix was applied the FPR decreased, but the error rate has gotten worse.
 
+## Assignment 4. Principal components
+
+#import data
+setwd("/home/erik/Documents/SML/Semester 1/Machine Learning/Lab 2")
+r_data<-read.csv2("NIRSpectra.csv")
+data<-r_data[,-which(names(r_data)=="Viscosity")]
+
+#1.
+pca<-prcomp(data, center=TRUE, scale. = TRUE)
+
+df<-c()
+for (i in 1:length(pca$sdev)) {
+  df[i]<-pca$sdev[i]^2/sum(pca$sdev^2)
+}
+plot(df, type = "l")
+
+vsum<-0
+for (i in 1:length(pca$sdev)) {
+  vsum<-vsum+pca$sdev[i]^2/sum(pca$sdev^2)
+  if (vsum>0.99) {
+    print(vsum)
+    print(i)
+    break()
+  }
+}
+
+plot(pca$x[,"PC1"],pca$x[,"PC2"], xlab = "PC1", ylab = "PC2")
+
+#2.
+plot(pca$rotation[,1], main="PC1 Traceplot", xlab = "Features", ylab = "Scores")
+plot(pca$rotation[,2], main="PC2 Traceplot", xlab = "Features", ylab = "Scores")
+
+
+#3.
+library(fastICA)
+set.seed(12345)
+mdata<-as.matrix(data)
+
+ica<-fastICA(mdata, 2, fun = "logcosh", verbose = TRUE)
+
+W_<-ica$K %*% ica$W
+
+plot(W_[,1], main="PC1 Traceplot", xlab = "Features", ylab = "Scores")
+plot(W_[,2], main="PC2 Traceplot", xlab = "Features", ylab = "Scores")
+
+plot(ica$S[,1],ica$S[,2], xlab = "W1", ylab = "W2")
 
