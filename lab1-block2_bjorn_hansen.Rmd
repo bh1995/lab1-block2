@@ -27,14 +27,14 @@ test=sp[-id,]
 
 ## Adaboost
 
-Adaboost classification trees are used to train the model.Inside the boost control argument a value of 0.6 for "nu" was used as this value gave the lowest error. Adaboost predicts a loss score so to make a hard decision a threshold of 0.1 was used as this value gave roughly the lowest error. As can be seen from the confusion matrix below (using 100 trees) the diagonal values are quite high meaning that the ada model is predicting with high accuaracy. 
+Adaboost classification trees are used to train the model.Inside the boost control argument a value of 0.6 for "nu" was used as this value gave the lowest error. Adaboost predicts assignment through majority voting, the comand type = "class" is used to do this. As can be seen from the confusion matrix below (using 100 trees) the diagonal values are quite high meaning that the ada model is predicting with high accuaracy. 
 
 ```{r, echo=FALSE}
 library(mboost)
-  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = 100, nu = 0.6),
+  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = 100, nu = 0.5),
                        family = AdaExp())
-  fitted.results_test= predict(ada_model,newdata=test)
-  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  fitted.results_test= predict(ada_model,newdata=test, type = "class")
+  #fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
   ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
   print(table("Y"=test$Spam,"Y hat"=fitted.results_test))
   
@@ -49,10 +49,10 @@ library(ggplot2)
 acc=0
 n = seq(10, 100, by = 10)
 for(i in n){
-  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = i, nu = 0.6),
+  ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = i, nu = 0.5),
                        family = AdaExp())
-  fitted.results_test= predict(ada_model,newdata=test)
-  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  fitted.results_test= predict(ada_model,newdata=test, type = "class")
+  #fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
   misClasificError_test = mean(fitted.results_test != test$Spam)
   ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
   acc[i] = sum(diag(ada_confmat_test)) / sum(ada_confmat_test)
@@ -269,8 +269,8 @@ n = seq(10, 100, by = 10)
 for(i in n){
   ada_model = blackboost(Spam ~., data = train, control = boost_control(mstop = i, nu = 0.6),
                        family = AdaExp())
-  fitted.results_test= predict(ada_model,newdata=test)
-  fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
+  fitted.results_test= predict(ada_model,newdata=test, type = "class")
+  #fitted.results_test = ifelse(fitted.results_test > 0.1,1,0)
   misClasificError_test = mean(fitted.results_test != test$Spam)
   ada_confmat_test = table("Y"=test$Spam,"Y hat"=fitted.results_test)
   acc[i] = sum(diag(ada_confmat_test)) / sum(ada_confmat_test)
