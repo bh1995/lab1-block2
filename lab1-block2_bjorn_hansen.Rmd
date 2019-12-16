@@ -8,6 +8,20 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, include=TRUE}
+setwd("C:/Users/Bjorn/Documents/LIU/machine_learning/labs")
+library(readxl)
+library(tree)
+library(e1071)
+library(SDMTools)
+library(ggrepel)
+library(ggplot2)
+library(boot)
+library(fastICA)
+```
 
 ## 1. ENSEMBLE METHODS
 
