@@ -2,14 +2,16 @@
 title: "lab2-block2_group5_report"
 author: "Bjorn_Hansen, Erik Anders, Ahmed Alhasan"
 date: "12/16/2019"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Assignment 1. Using GAM and GLM to examine the mortality rates
+### Assignment 1. Using GAM and GLM to examine the mortality rates
 
 ## 1
 
@@ -96,7 +98,143 @@ ggplot(data=data, aes(x=Time))+
 ```
 
 
-## Assignment 2. High-dimensional methods
+### Assignment 2. High-dimensional methods
+
+# 1.
+
+The nearest squished centroids model using cross validation had at lowest 6 errors, the largest threshold with 6 errors was 2.757. This threshold was then used in the output plots below. Using the cntroid plot, the 12 most contributing features for making predictions both negative (0) and positive (1). 
+
+```{r, echo=FALSE, message=FALSE}
+setwd("C:/Users/Bjorn/Documents/LIU/machine_learning/labs")
+data<-read.csv2("data.csv", header = TRUE, sep = ";", check.names = FALSE ,encoding = "latin1")
+#names(data)<-iconv(names(data), to = "ASCII", sub = "")
+
+#1.
+n=dim(data)[1]
+set.seed(12345)
+id=sample(1:n, floor(n*0.7))
+train=data[id,]
+test=data[-id,]
+
+train<-na.omit(train)
+train2<-train[,-which(names(train) == "Conference")]
+train2<-t(train2)
+
+#data2<-list(x=train[,-which(names(train) == "Conference")], y=factor(train$Conference))
+data2<-list(x=train2, y=as.factor(train$Conference),geneid=as.character(1:nrow(train2)), genenames=rownames(train2))
+
+
+library(pamr)
+pamr_m<-pamr.train(data2)
+pamr_cv<-pamr.cv(pamr_m, data2)
+pamr_cv
+
+pamr.plotcv(pamr_cv)
+pamr.plotcen(pamr_m, data2, threshold=2.757)
+```
+
+```{r, echo=FALSE}
+test2<-test[,-which(names(train) == "Conference")]
+test2<-t(test2)
+data3<-list(x=test2, y=test$Conference)
+
+pred_nsc = pamr.predict(pamr_m, threshold = 2.757, newx=test2)
+nsc_confmat = table("Y"=test$Conference,"Y hat"=pred_nsc)
+nsc_confmat
+print(paste("NSC Error Rate with Test Data:", round(1-sum(diag(nsc_confmat))/sum(nsc_confmat),4)))
+
+
+a=pamr.listgenes(pamr_m,data2,threshold=2.757)
+
+print("Top 10 most contributing features:")
+cat( paste( colnames(data)[as.numeric(a[,1])][1:10], collapse='\n' ) ) #paste first 10 features.
+```
+
+# 2a,b
+
+```{r, echo=FALSE, message=FALSE}
+library(glmnet)
+library(pamr)
+library(kableExtra)
+library(kernlab)
+
+xdata = as.matrix(train[,-ncol(train)])
+ydata = train[,ncol(train)]
+xtest = as.matrix(test[,-ncol(test)])
+ytest = test[,ncol(test)]
+
+elasticnet_model = cv.glmnet(x=xdata,y=ydata,alpha=0.5,family="binomial")
+elasticnet_model.predict = predict(elasticnet_model, newx = as.matrix(test[,-4703]), type = "class", s="lambda.min")
+elasticnet_confmat = table("Y"=test$Conference,"Y hat"=elasticnet_model.predict)
+elasticnet_confmat
+print(paste("Elastic net Error Rate with Test Data:", round(1-sum(diag(elasticnet_confmat))/sum(elasticnet_confmat),4)))
+coefs = as.matrix(coef(elasticnet_model, elasticnet_model$lambda.min))
+elastic_features <- length(names(coefs[coefs != 0,])) 
+print(paste("Number of contributing features:",elastic_features))
+
+features = pamr.listgenes(pamr_m, data2, threshold = 2.757, genenames = TRUE)
+
+res1 = list("Error Rate" = round(1-sum(diag(nsc_confmat))/sum(nsc_confmat),4), "Features Selected" = nrow(features))
+
+res2 = list("Error Rate" = round(1-sum(diag(elasticnet_confmat))/sum(elasticnet_confmat),4), "Features Selected" = elastic_features)
+
+invisible(capture.output(
+  svm <- ksvm(Conference ~ ., 
+            data = train, 
+            kernel="vanilladot",
+            scaled = FALSE)))
+
+
+svm_pred <- predict(svm, newdata = test)
+
+svm_mat  <- table(ytest, svm_pred)
+svm_rate <- 1 - sum(diag(svm_mat)) / sum(svm_mat)
+
+res3 <- list("Error Rate" = svm_rate, "Features Selected" = svm@nSV)
+
+result = rbind("NSC" = res1, "Elastic Net" = res2, "SVM" = res3)
+
+knitr::kable(result)
+```
+
+*Which model would you prefer and why?* 
+
+- The NSC gave the least error but used too many variables, and could have been a higher rate if set.seed was different. The Elastic Net and SVM perform very close to each other, however Elastic Net is more interpretable and preferable to the other two.
+
+### 3. Benjamini-Hochberg
+
+*Which features correspond to the rejected hypotheses?*
+
+```{r echo=FALSE, message=FALSE}
+hochberg <- function(x, y, alpha) {
+  p <- apply(x, 2, function(x_data){t.test(x_data ~ y, alternative = "two.sided")$p.value})
+
+  rank     <- as.matrix(sort(p))
+  l        <- length(p)
+  values   <- (1:l/l) * alpha
+  T_F      <- matrix(0,4702,1)
+  z        <- data.frame("P-Values" = rank,"T_F" = T_F)
+  
+  for(i in 1:4702){
+    if(rank[i] <= values[i]){
+      z[i,2] <- "Rejected"
+    }
+    else{z[i,2] <- "Accepted"}
+  }
+  lowest_p <- subset(z, T_F == "Rejected")
+  return(lowest_p)
+}
+
+lowest_p <- hochberg(x = data[,-4703], y = data[,4703], alpha=0.05)
+
+lowest_p
+```
+
+*Interpret the result.* 
+
+- The list of words selected by Benjamini-Hochberg method emphisize on lowering the false-discovery rate, meaning these words are the ones that give the least False Positive errors.
+
+\pagebreak
 
 ## Appendix
 ```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
